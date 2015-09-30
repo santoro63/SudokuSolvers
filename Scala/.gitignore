@@ -1,0 +1,4 @@
+# sbt build artifacts
+/target
+/project/target
+

@@ -1,0 +1,8 @@
+# python stuff
+.pyc
+
+# emacs stuff
+*~
+
+# java stuff
+.class

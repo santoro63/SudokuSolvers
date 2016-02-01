@@ -15,6 +15,7 @@ public class Main {
 	    List<Puzzle> currentPuzzles = new LinkedList<>();
         currentPuzzles.add(initialPuzzle);
         while (!currentPuzzles.get(0).solved()) {
+            System.out.println("--> " + currentPuzzles.size());
             List<Puzzle> nextPuzzles = new LinkedList<>();
             for (Puzzle p: currentPuzzles) {
                 nextPuzzles.addAll( p.expand());

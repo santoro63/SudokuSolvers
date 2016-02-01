@@ -75,7 +75,7 @@ public class Puzzle {
             for (int j=0; j<9; j++) {
                 b.append(thePuzzle[9*i+j]);
             }
-            b.append('\n');git 
+            b.append('\n');
         }
         return b.toString();
     }

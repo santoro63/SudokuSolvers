@@ -4,32 +4,22 @@
 
 (def SIZE 9)
 
-(defn row-col-group [ idx ]
-  (defn get-row [ x ]
-    (int (/ x SIZE)))
-  (defn get-col [ x ]
-    (mod x SIZE))
-  (defn get-group [ x ]
-    (let [ x-idx (get-row x)
-           y-idx (get-col x) ]
-        (+ (* 10 (int (/ x-idx 3))) (int (/ y-idx 3)))))
-  [ (get-row idx) (get-col idx) (get-group idx) ])
-
-(def rcg (into [] (map row-col-group (range 0 81))))
-
 (defn zip [ l1 l2 ]
   (map vector l1 l2))
 
-(defn pos-belongs [ rcg idx_puzzle_tile ]
-  (let [ r1 (first rcg)
-        c1 (second rcg)
-        g1 (first (rest (rest rcg)))
-        puzzle_idx (first idx_puzzle_tile)
-        r2 (first puzzle_idx)
-        c2 (second puzzle_idx)
-        g2 (first (rest (rest puzzle_idx))) 
-        ]
-    (or (= r1 r2) (= c1 c2) (= g1 g2))))
+(defn grp-func [ [x y] ]
+  (+ (* 3 (int (/ x 3))) (int (/ y 3))))
+
+
+(def row_labels (map #(int (/ % 9)) (range 0 81)))
+(def col_labels (map #(mod % 9) (range 0 81)))
+(def grp_labels (map grp-func (zip row_labels col_labels)))
+                     
+(defn get-at-pos [ pos arr ]
+  (if (= 0 pos)
+    (first arr)
+    (get-at-pos (- pos 1) (rest arr))))
+
 
 (defn pos-first-underscore [ puzzle ]
   (.indexOf puzzle "_"))
@@ -38,19 +28,18 @@
   (let [ p (into [] puzzle) ]
         (assoc p pos new-char)))
         
-(defn get-position-tiles [pos idx-puzzle]
-  (let [ 
-        pos-rcg (rcg pos)
-        tiles (filter #(pos-belongs pos-rcg %) idx-puzzle) 
-        ]
-    (into #{} (map #(% 1) tiles))))
-          
+
+(defn get-same [ pos labels puzzle ]
+  (let [ tile_grp (get-at-pos pos labels) ]
+    (map #(second %) (filter #(= tile_grp (first %)) (zip labels puzzle)))))
+
 (defn expand-puzzle [pos puzzle]
   (let [
-        idx-puzzle (zip rcg puzzle)
-        bad-vals (get-position-tiles pos idx-puzzle)
-        candidates (clojure.set/difference #{"1" "2" "3" "4" "5" "6" "7" "8" "9"} bad-vals) ]
-    (map #(replace-first-underscore pos % puzzle) candidates)))
+        row_tiles (get-same pos row_labels puzzle)
+        col_tiles (get-same pos col_labels puzzle)
+        grp_tiles (get-same pos grp_labels puzzle)
+        candidates (clojure.set/difference #{"1" "2" "3" "4" "5" "6" "7" "8" "9"} (into #{} (concat row_tiles col_tiles grp_tiles))) ]
+      (map #(replace-first-underscore pos % puzzle) candidates)))
 
 (defn expand-puzzles [puzzles]
   (let [ pos (pos-first-underscore (first puzzles)) ]
@@ -75,6 +64,6 @@
     
 (defn -main [& args]
   (let [ puzzletext (slurp (first args))
-         puzzle (rest (filter #(not (= % "\n")) (clojure.string/split puzzletext #"")))]
+        puzzle (filter #(not (= % "\n")) (clojure.string/split puzzletext #""))]
     (doseq [ sol (solve (vector puzzle)) ]
       (print-puzzle sol))))

@@ -33,12 +33,20 @@
   (let [ tile_grp (get-at-pos pos labels) ]
     (map #(second %) (filter #(= tile_grp (first %)) (zip labels puzzle)))))
 
+(defn get-belonging [r rl c cl g gl puzzle_arr]
+  (cond (empty? puzzle_arr) '()
+        (or (= r (first rl))
+            (= c (first cl))
+            (= g (first gl))) (cons (first puzzle_arr) (get-belonging r (rest rl) c (rest cl) g (rest gl) (rest puzzle_arr)))
+            :else                 (get-belonging r (rest rl) c (rest cl) g (rest gl) (rest puzzle_arr))))
+
 (defn expand-puzzle [pos puzzle]
   (let [
-        row_tiles (get-same pos row_labels puzzle)
-        col_tiles (get-same pos col_labels puzzle)
-        grp_tiles (get-same pos grp_labels puzzle)
-        candidates (clojure.set/difference #{"1" "2" "3" "4" "5" "6" "7" "8" "9"} (into #{} (concat row_tiles col_tiles grp_tiles))) ]
+        row (get-at-pos pos row_labels)
+        col (get-at-pos pos col_labels)
+        grp (get-at-pos pos grp_labels)
+        bad_tiles (get-belonging row row_labels col col_labels grp grp_labels puzzle)
+        candidates (clojure.set/difference #{"1" "2" "3" "4" "5" "6" "7" "8" "9"} (into #{} bad_tiles)) ]
       (map #(replace-first-underscore pos % puzzle) candidates)))
 
 (defn expand-puzzles [puzzles]

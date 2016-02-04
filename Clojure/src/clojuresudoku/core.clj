@@ -28,11 +28,6 @@
   (let [ p (into [] puzzle) ]
         (assoc p pos new-char)))
         
-
-(defn get-same [ pos labels puzzle ]
-  (let [ tile_grp (get-at-pos pos labels) ]
-    (map #(second %) (filter #(= tile_grp (first %)) (zip labels puzzle)))))
-
 (defn get-belonging [r rl c cl g gl puzzle_arr]
   (cond (empty? puzzle_arr) '()
         (or (= r (first rl))
@@ -59,9 +54,10 @@
 (defn solve [ puzzles ]
   (if (solved? (first puzzles))
     puzzles
-    (do
-      (println "-->" (str (count puzzles)) "so far")
-      (recur (expand-puzzles puzzles)))))
+    ;;  (do
+    ;;  (println "-->" (str (count puzzles)) "so far")
+    (recur (expand-puzzles puzzles))))
+    ;;  )
 
 (defn print-puzzle [ puzzle ]
   (if (empty? puzzle)

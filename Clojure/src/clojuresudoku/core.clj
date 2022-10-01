@@ -23,12 +23,10 @@
   "Creates a puzzle from the specified file"
   (->>
    (slurp filename)
-   (seq)
    (filter (fn [c] (contains? ALLOWED_VALUES c)))
    (map-indexed (fn [i v] (make-tile i v)))
    (vec)
    ))
-
 
 (defn solve-puzzle
   [puzzle-stack]

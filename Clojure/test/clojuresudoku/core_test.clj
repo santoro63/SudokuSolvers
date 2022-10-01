@@ -2,43 +2,38 @@
   (:require [clojure.test :refer :all]
             [clojuresudoku.core :refer :all]))
 
-;; some fixtures
-(def board (range 0 81))
-(def indexed-board (zip rcg board))
+;;---------------
+;; AUX FUNCTIONS
+;;---------------
+
+(defn valid-tile?
+  [ tile ]
+  "Returns true if tile has only allowed values."
+  (and (<= 0 (tile :row) 8)
+       (<= 0 (tile :col) 8)
+       (<= 0 (tile :grp) 8)
+       (<= 0 (tile :idx) 80)
+       (contains? ALLOWED_VALUES (tile :val))))
+
+;;--------
+;; TESTS
+;;--------
+
+(deftest make-tile-test
+
+  (testing "tile creation is successful."
+    (is (= {:idx  0 :row 0 :col 0 :grp 0 :val \1} (make-tile 0 \1)))
+    (is (= {:idx 31 :row 3 :col 4 :grp 4 :val \_} (make-tile 31 \_)))))
 
 
-;; the tests
-(deftest solved-test
-  (testing "solved returns true"
-    (is (solved? '( "1" "2" "3"))))
-  (testing "not solved returns false"
-    (is (not (solved? '( "1" "_" "3"))))))
+(deftest load-puzzle-test
 
-(deftest replace-underscore-test
-  (testing "replaces if first"
-    (is (= '( "1" "2" "3") (replace-first-underscore "1" '("_" "2" "3")))))
-  (testing "replaces if middle"
-    (is (= '( "1" "2" "3") (replace-first-underscore "2" '("1" "_" "3")))))
-  (testing "no change if nothing to replace"
-    (is (= '( "4" "5" "6") (replace-first-underscore "3" '("4" "5" "6"))))))
+  (testing "load works with good puzzles"
+    (let [ testee (load-puzzle "test/resources/puzzle1.sudoku") ]
+      (is (= 81 (count testee)))
+      (is (every? valid-tile? testee))
+      (is (= {:idx  0 :row 0 :col 0 :grp 0 :val \_} (testee 0))) 
+      (is (= {:idx 55 :row 6 :col 1 :grp 6 :val \_} (testee 55)))
+      ))
+  )
 
-(deftest position-of-first-underscore-test
-  (testing "first entry is _"
-    (is (= 0 (pos-first-underscore [ "_" "1" "2" "3" ]))))
-  (testing "middle entry is _"
-    (is (= 3 (pos-first-underscore [ "0" "1" "2" "_" "4" "5" ]))))
-  (testing "missing _"
-    (is (= -1 (pos-first-underscore [ "0" "1" "2" ])))))
-
-(deftest position-tiles-test
-  (testing "get all tiles in position"
-    (is (= #{0 1 2 3 4 5 6 7 8 9 18 27 36 45 54 63 72 10 11 19 20}
-           (get-position-tiles 0 board)))))
-
-(deftest grouping-test
-  (testing "row-group-test"
-    (is (= (list 0 1 2 3 4 5 6 7 8) (row-group 0 indexed-board))))
-  (testing "col-group-test"
-    (is (= (list 1 10 19 28 37 46 55 64 73) (col-group 1 indexed-board))))
-  (testing "square-group-test"
-    (is (= (list 27 28 29 36 37 38 45 46 47) (square-group 38 indexed-board)))))

@@ -61,16 +61,14 @@
 
 (defn new-puzzle [puzzle empty-tile c]
   (let [idx (empty-tile :idx)]
-    (vec
-     (map (fn [x] (if (= idx (x :idx)) (make-tile idx c) x)) puzzle))))
+     (mapv (fn [x] (if (= idx (x :idx)) (make-tile idx c) x)) puzzle)))
 
 (defn new-puzzles
   [puzzle]
   "Create a list of new puzzles from PUZZLE or an empty list if no new puzzles are possible.
 The new puzzles are created by replacing the first empty tile with all viable candidates."
   (let [empty-tile (first-empty puzzle)]
-    (vec
-     (map (fn [c] (new-puzzle puzzle empty-tile c)) (candidates-for puzzle empty-tile)))))
+     (mapv (fn [c] (new-puzzle puzzle empty-tile c)) (candidates-for puzzle empty-tile))))
 
 (defn solve-puzzle-depth-first
   [puzzle-stack]

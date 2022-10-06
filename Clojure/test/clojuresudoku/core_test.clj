@@ -1,4 +1,5 @@
 (ns clojuresudoku.core-test
+
   (:require [clojure.test :refer :all]
             [clojuresudoku.core :refer :all]))
 
@@ -27,6 +28,18 @@
   "True if all tiles in the set have distinct values"
   (let [values (map (fn [x] (x :val)) tile-seq)]
     (= SOLUTION_VALUES (set values))))
+
+(defn valid-tile-grp?
+  [tile-seq]
+  "Valid if all tiles in the group  have a value and are distinct."
+  (and (= 9 (count tile-seq))
+       (= SOLUTION_VALUES (set (map (fn [x] (x :val)) tile-seq)))))
+
+(defn get-group
+  [type id puzzle]
+  "Return the group of tiles that have that particular ID for type (one of :row, :col or :grp)."
+  (filterv (fn [x] (= (x type) id)) puzzle))
+
 
 ;;--------
 ;; TESTS
@@ -60,6 +73,15 @@
     (let [ testee (solve-puzzle (load-puzzle "test/resources/puzzle1.sudoku")) ]
       (is (solved? testee))
       (is (every? valid-tile? testee))
+      (is (->> (range 9)
+               (map (fn [x] (get-group :row x testee)))
+               (every? valid-tile-grp?)))
+      (is (->> (range 9)
+               (map (fn [x] (get-group :col x testee)))
+               (every? valid-tile-grp?)))
+      (is (->> (range 9)
+               (map (fn [x] (get-group :grp x testee)))
+               (every? valid-tile-grp?)))
       ))
-  )<
+  )
             

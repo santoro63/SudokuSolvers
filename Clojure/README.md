@@ -1,36 +1,30 @@
 # clojuresudoku
 
-FIXME: description
+An implementation of a sudoku solver.
 
 ## Installation
 
-Download from http://example.com/FIXME.
+Assumes you have leiningen installed.
+
+1. Clone this repo
+2. `cd Clojure` (this directory)
+3. `lein jar`
+4. Copy the generated file wherever you want to save it.
+
 
 ## Usage
 
-FIXME: explanation
+Given a file containing a sudoku puzzle, prints the solution on stdout.
 
     $ java -jar clojuresudoku-0.1.0-standalone.jar [args]
 
-## Options
-
-FIXME: listing of options this app accepts.
 
 ## Examples
 
-...
+Running against one of the puzzles in the test directory:
 
-### Bugs
+```sh
+$ java -jar clojouver-0.2.0-SNAPSHOT.jar test/resources/puzzle1.sudoku
+```
 
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
-
-## License
-
-Copyright © 2015 FIXME
-
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+x

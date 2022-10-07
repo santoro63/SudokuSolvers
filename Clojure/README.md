@@ -8,7 +8,7 @@ Assumes you have leiningen installed.
 
 1. Clone this repo
 2. `cd Clojure` (this directory)
-3. `lein jar`
+3. `lein uberjar`
 4. Copy the generated file wherever you want to save it.
 
 
@@ -16,15 +16,27 @@ Assumes you have leiningen installed.
 
 Given a file containing a sudoku puzzle, prints the solution on stdout.
 
-    $ java -jar clojuresudoku-0.1.0-standalone.jar [args]
+    $ java -jar clojuresudoku-0.2.0-SANPSHOT-standalone.jar <puzzlefile>
 
+where `<puzzlefile>` is the path to a file containing a sudoku puzzle.
 
 ## Examples
 
 Running against one of the puzzles in the test directory:
 
 ```sh
-$ java -jar clojouver-0.2.0-SNAPSHOT.jar test/resources/puzzle1.sudoku
+$ java -jar clojuresudoku-0.2.0-SNAPSHOT-standalone.jar test/resources/puzzle1.sudoku
 ```
 
-x
+Which should print out the following solution:
+```
+694728531
+513964872
+782513694
+937681425
+261495783
+458237169
+875349216
+346172958
+129856347
+```

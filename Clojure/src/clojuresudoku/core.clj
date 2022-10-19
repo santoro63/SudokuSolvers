@@ -73,11 +73,13 @@ The new puzzles are created by replacing the first empty tile with all viable ca
 (defn solve-puzzle-depth-first
   [puzzle-stack]
   "Does the actual walk-through and solving."
-  (let [current-puzzle (peek puzzle-stack)
-        stack          (pop puzzle-stack)]
-  (cond (nil? current-puzzle) nil
-        (solved? current-puzzle) current-puzzle
-        :else (solve-puzzle-depth-first (vec (concat stack (new-puzzles current-puzzle)))))))
+  (loop [ ps puzzle-stack ]
+    
+    (let [current-puzzle (peek ps)
+          stack          (pop ps)]
+      (cond (nil? current-puzzle) nil
+            (solved? current-puzzle) current-puzzle
+            :else (recur (vec (concat stack (new-puzzles current-puzzle))))))))
 
 (defn solve-puzzle
   [puzzle]

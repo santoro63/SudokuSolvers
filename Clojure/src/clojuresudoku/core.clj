@@ -19,21 +19,21 @@
      :val val }))
 
 (defn- tile-values [tile-seq]
-  (map (fn [x] (x :val)) tile-seq))
+  (map #(% :val) tile-seq))
 
 (defn load-puzzle
   [filename]
   "Creates a puzzle from the specified file"
   (->>
    (slurp filename)
-   (filter (fn [c] (contains? ALLOWED_VALUES c)))
+   (filter #(contains? ALLOWED_VALUES %))
    (map-indexed (fn [i v] (make-tile i v)))
    (vec)
    ))
 
 (defn solved? [puzzle]
   "True if a puzzle is solved (by which we mean complete)."
-  (every? (fn [x] (not (= x \_))) (tile-values puzzle)))
+  (every? #(not (= % \_)) (tile-values puzzle)))
 
 (defn- related? [t1 t2]
   "Returns true if the two tiles are related."
@@ -42,7 +42,7 @@
       (= (t1 :grp) (t2 :grp))))
 
 (defn related-tiles [puzzle tile]
-  (filter (fn [x] (related? x tile)) puzzle))
+  (filter #(related? % tile) puzzle))
 
 (defn candidates-for
   [puzzle empty-tile]
@@ -94,7 +94,7 @@ The new puzzles are created by replacing the first empty tile with all viable ca
    puzzle
    (tile-values)
    (partition 9)
-   (map (fn [x] (clojure.string/join "" x)))
+   (map #(clojure.string/join " " %))
    (clojure.string/join "\n")
   ))
 

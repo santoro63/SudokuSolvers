@@ -1,5 +1,7 @@
 package com.puzzles.sudoku
 
+import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
 
 object Solver {
@@ -21,48 +23,39 @@ object Solver {
   def solve(puzzle: Puzzle): Option[Puzzle] = walkStack(List(puzzle))
 
 
-  // Expands the candidate set by replacing the first '_' of each candidate
-  // with 1..9, creating 9 new candidate solutions
-  private def expand_candidates(candidates: List[Puzzle]) = {
-    candidates.flatMap(c => expand_candidate(c))
-  }
 
   // Creates 9 candidate solutions for one candidate by replacing
   // the first '_' with 1..9 and eliminating solutions that are not feasible
-  private def expand_candidate(candidate: Puzzle): List[Puzzle] = {
-    candidate_values(candidate)
-      .map(v => replace_first_underscore(candidate, v)).toList
+  def expand_candidate(candidate: Puzzle): List[Puzzle] = {
+    val refTile = candidate.find(_.empty).get
+    val candidateValues = candidate_values(candidate, refTile)
+    candidateValues.map(v => replace_first_underscore(candidate,  refTile, v)).toList
   }
 
-  private def replace_first_underscore(candidate: Puzzle, valueToReplace: Char): Puzzle = {
-    candidate match {
-      case List() => List()
-      case Tile(idx, '_') :: otherVals => Tile(idx, valueToReplace) :: otherVals
-      case x :: otherVals => x :: replace_first_underscore(otherVals, valueToReplace)
-    }
-
+  private def replace_first_underscore(candidate: Puzzle, tile: Tile, valueToReplace: Char): Puzzle = {
+    val tmp : ArrayBuffer[Tile] = ArrayBuffer()
+    tmp ++= candidate
+    tmp(tile.index) = Tile(tile.index, valueToReplace)
+    tmp.toList
   }
 
-  private def firstEmptyTile(puzzle: Puzzle): Tile = {
-    puzzle.find(_.empty).get
-  }
-
-  private def candidate_values(puzzle: Puzzle) : Set[Char] = {
-    val tile: Tile = firstEmptyTile(puzzle)
-    val puzzleValues: List[Char] = puzzle.filter(_.isRelated(tile)).map(_.content)
+  private def candidate_values(puzzle: Puzzle, tile: Tile) : Set[Char] = {
+    val puzzleValues: List[Char] = puzzle.filter(tile.isRelated(_)).map(_.content)
     FILLED_VALUES.diff(puzzleValues.toSet)
    }
 
   // main part_of the algorithm,
   private def walkStack(candidates: List[Puzzle]): Option[Puzzle] = {
-    if (candidates.length == 0) {
-      None
-    } else if (solved(candidates.head)) {
-      Some(candidates.head)
-    } else {
-      val newCandidates = expand_candidate(candidates.head)
-      walkStack(newCandidates ++ candidates.tail)
+    if (candidates.isEmpty) {
+      return None
     }
+    val currentPuzzle = candidates.head
+    if (solved(currentPuzzle)) {
+      return Some(currentPuzzle)
+    }
+    val otherCandidates = candidates.tail
+    val newCandidates = expand_candidate(currentPuzzle)
+    walkStack(newCandidates ++ otherCandidates)
   }
 
   def printSolution(sol: Puzzle): Unit = {
@@ -73,8 +66,6 @@ object Solver {
       println()
       printSolution(sol.drop(9))
     }
-
-
   }
 
   def solved(puzzle: Puzzle) = puzzle.forall( (! _.empty))

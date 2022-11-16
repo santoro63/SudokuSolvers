@@ -11,10 +11,17 @@ class TileSpec extends AnyFlatSpec with Matchers {
     Tile (18, '_').content shouldBe '_'
   }
 
-  "A Tile" should "know if its empty" in {
+  "A Tile" should "know its group" in {
+    Tile(0, '_').grp shouldBe 0
+    Tile(5, '_').grp shouldBe 1
+    Tile(28, '_').grp shouldBe 3
+  }
+
+  "A Tile" should "know if it's empty" in {
     Tile(0, '3').empty shouldBe false
     Tile(0, '_').empty shouldBe true
   }
+
 
   "A Tile" should "know related ones" in {
     val testee = new Tile(0, '3')
